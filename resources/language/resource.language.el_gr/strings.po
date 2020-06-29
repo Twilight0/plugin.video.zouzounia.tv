@@ -54,8 +54,8 @@ msgid "No bookmarks were found"
 msgstr "Δεν βρέθηκαν σελιδοδείκτες"
 
 msgctxt "#30013"
-msgid "Zouzounia's Friends"
-msgstr "Οι φίλοι των Ζουζουνιών"
+msgid ""
+msgstr ""
 
 msgctxt "#30014"
 msgid "Misc"

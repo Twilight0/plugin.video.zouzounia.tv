@@ -1,3 +1,8 @@
+29-06-2020 - [B]3.0.0[/B]
+- Addon rework
+- New youtube api keys
+- Removed third party content
+
 15-06-2018 - [B]2.0.0[/B]
 - Added English/Greek Language selector
 - Tulip libraries are now used

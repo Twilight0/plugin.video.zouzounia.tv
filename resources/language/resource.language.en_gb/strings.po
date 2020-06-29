@@ -54,7 +54,7 @@ msgid "No bookmarks were found"
 msgstr ""
 
 msgctxt "#30013"
-msgid "Zouzounia's Friends"
+msgid ""
 msgstr ""
 
 msgctxt "#30014"
