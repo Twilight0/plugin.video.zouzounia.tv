@@ -39,7 +39,7 @@ else:
     main_id = 'UCzsQf6eiWz4gIHgx0oYadXA'
 
 
-key = b64decode('nZzbjNEWFNVLz5kakF3VUBDWrlkQ1lEVQJUYyp3VL9FR5NVY6lUQ'[::-1])  # please do not copy this key
+key = b64decode('zNHTHh1STN3SzVERB9kUmFWVmlkUFJ1UwYHZZJkUh5kQ5NVY6lUQ'[::-1])  # please do not copy this key
 
 
 class Zouzounia:

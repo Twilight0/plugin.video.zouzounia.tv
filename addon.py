@@ -56,10 +56,6 @@ elif action == 'youtube':
 
     navigator.Zouzounia().youtu(url)
 
-elif action == 'third_party':
-
-    navigator.Zouzounia().third_party()
-
 elif action == 'bookmarks':
 
     navigator.Zouzounia().bm_list()

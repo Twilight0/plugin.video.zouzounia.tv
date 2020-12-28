@@ -1,3 +1,7 @@
+28-12-2020 - [B]3.1.0[/B]
+- Updated youtube api key
+- Bumped dependencies
+
 29-06-2020 - [B]3.0.0[/B]
 - Addon rework
 - New youtube api keys
