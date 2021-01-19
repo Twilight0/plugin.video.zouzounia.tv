@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.zouzounia.tv" name="Zouzounia TV" version="3.0.1" provider-name="Twilight0">
+<addon id="plugin.video.zouzounia.tv" name="Zouzounia TV" version="3.1.1" provider-name="Twilight0">
     <requires>
         <import addon="xbmc.addon" version="16.1.000"/>
         <import addon="plugin.video.youtube" version="6.8.2"/>
@@ -31,4 +31,8 @@
 - Added English/Greek/Japanese Language selector
 - Tulip libraries are now used
 - Increased number of recent videos due to improvemens on youtube module</news>
+    <assets>
+        <icon>icon.png</icon>
+        <fanart>fanart.jpg</fanart>
+    </assets>
 </addon>
