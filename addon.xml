@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.zouzounia.tv" name="Zouzounia TV" version="3.1.1" provider-name="Twilight0">
+<addon id="plugin.video.zouzounia.tv" name="Zouzounia TV" version="4.0.0" provider-name="Twilight0">
     <requires>
         <import addon="xbmc.addon" version="16.1.000"/>
-        <import addon="plugin.video.youtube" version="6.8.2"/>
-        <import addon="script.module.tulip" version="2.8.1"/>
+        <import addon="plugin.video.youtube" version="6.8.10"/>
+        <import addon="script.module.tulip" version="2.8.9"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
@@ -11,28 +11,28 @@
     <extension point="xbmc.addon.metadata">
         <platform>all</platform>
         <reuselanguageinvoker>false</reuselanguageinvoker>
-        <summary lang="en">Zouzounia TV addon</summary>
-        <description lang="en">Zouzounia TV addon</description>
-        <summary lang="el">Πρόσθετο Zouzounia TV</summary>
-        <description lang="el">Πρόσθετο Zouzounia TV</description>
+        <summary lang="en_GB">Zouzounia TV addon</summary>
+        <description lang="en_GB">Zouzounia TV addon</description>
+        <summary lang="el_GR">Πρόσθετο Zouzounia TV</summary>
+        <description lang="el_GR">Πρόσθετο Zouzounia TV</description>
         <license>GNU GPL, version 3</license>
         <website>https://www.youtube.com/channel/UCzsQf6eiWz4gIHgx0oYadXA</website>
-    </extension>
-    <news>28-12-2020 - [B]3.1.0[/B]
+        <news>[B]4.0.0[/B]
+- Reworked addon code to use url dispatcher
+- Utilize Function cache instead of legacy cache.get for listings
+
+[B]3.1.X[/B]
 - Updated youtube api key
 - Bumped dependencies
+- Various minor tweaks
 
-29-06-2020 - [B]3.0.0[/B]
+[B]3.0.0[/B]
 - Addon rework
 - New youtube api keys
-- Removed third party content
-
-15-06-2018 - [B]2.0.0[/B]
-- Added English/Greek/Japanese Language selector
-- Tulip libraries are now used
-- Increased number of recent videos due to improvemens on youtube module</news>
-    <assets>
-        <icon>icon.png</icon>
-        <fanart>fanart.jpg</fanart>
-    </assets>
+- Removed third party content</news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
 </addon>

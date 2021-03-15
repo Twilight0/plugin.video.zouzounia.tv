@@ -17,12 +17,16 @@
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 
 import json
 from base64 import b64decode
 from tulip import youtube, directory, control, cache, bookmarks, client
-from tulip.compat import iteritems
+from tulip.url_dispatcher import urldispatcher
+from tulip.compat import iteritems, py3_dec
 from youtube_resolver import resolve as resolver
+
+function_cache = cache.FunctionCache()
 
 if control.setting('language') == '0':
     if control.infoLabel('System.Language') == 'Greek':
@@ -39,161 +43,175 @@ else:
     main_id = 'UCzsQf6eiWz4gIHgx0oYadXA'
 
 
-key = b64decode('zNHTHh1STN3SzVERB9kUmFWVmlkUFJ1UwYHZZJkUh5kQ5NVY6lUQ'[::-1])  # please do not copy this key
+key = py3_dec(b64decode('0g0RRFlc2ITLUpVS2hjVhpmYF50cyknWENUMN9WQrFmQ5NVY6lUQ'[::-1]))  # please do not copy this key
 
 
-class Zouzounia:
-    
-    def __init__(self):
+@urldispatcher.register('main')
+def main():
 
-        self.list = []
+    self_list = [
+        {
+            'title': control.lang(30001),
+            'action': 'videos',
+            'icon': 'videos.jpg'
+        }
+        ,
+        {
+            'title': control.lang(30002),
+            'action': 'playlists',
+            'icon': 'playlists.jpg'
+        }
+        ,
+        {
+            'title': control.lang(30003),
+            'action': 'bookmarks',
+            'icon': 'heart.jpg'
+        }
+        ,
+        {
+            'title': control.lang(30004),
+            'action': 'settings',
+            'icon': 'settings.jpg',
+            'isFolder': 'False',
+            'isPlayable': 'False'
+        }
+    ]
 
-    def main(self):
+    cc = {'title': 30005, 'query': {'action': 'cache_clear'}}
 
-        self.list = [
-            {
-                'title': control.lang(30001),
-                'action': 'videos',
-                'icon': 'videos.jpg'
-            }
-            ,
-            {
-                'title': control.lang(30002),
-                'action': 'playlists',
-                'icon': 'playlists.jpg'
-            }
-            ,
-            {
-                'title': control.lang(30003),
-                'action': 'bookmarks',
-                'icon': 'heart.jpg'
-            }
-            ,
-            {
-                'title': control.lang(30004),
-                'action': 'settings',
-                'icon': 'settings.jpg',
-                'isFolder': 'False',
-                'isPlayable': 'False'
-            }
+    for item in self_list:
+        item.update({'cm': [cc]})
 
-        ]
+    directory.add(self_list)
 
-        cc = {'title': 30005, 'query': {'action': 'cache_clear'}}
 
-        for item in self.list:
-            item.update({'cm': [cc]})
+@function_cache.cache_method(12)
+def item_list():
 
-        directory.add(self.list)
-    
-    def item_list(self):
-    
-        return youtube.youtube(key=key).videos(main_id, limit=10)
+    return youtube.youtube(key=key).videos(main_id, limit=10)
 
-    def _playlists(self):
 
-        return youtube.youtube(key=key).playlists(main_id, limit=10)
+@function_cache.cache_method(48)
+def _playlists():
 
-    def playlists(self):
-    
-        self.list = cache.get(self._playlists, 24)
-    
-        for p in self.list:
-            p.update({'action': 'youtube'})
+    return youtube.youtube(key=key).playlists(main_id, limit=10)
 
-        for p in self.list:
-            bookmark = dict((k, v) for k, v in iteritems(p) if not k == 'next')
-            bookmark['bookmark'] = p['url']
-            bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
-            refresh = {'title': 30008, 'query': {'action': 'refresh'}}
-            cache_clear = {'title': 30005, 'query': {'action': 'cache_clear'}}
-            p.update({'cm': [refresh, cache_clear, bm_cm]})
 
-        directory.add(self.list)
-    
-    def youtu(self, plink):
-    
-        self.list = cache.get(youtube.youtube(key=key).playlist, 12, plink)
+@function_cache.cache_method(12)
+def _playlist(plink):
+    return youtube.youtube(key=key).playlist, 12, plink
 
-        if self.list is None:
-            return
 
-        for v in self.list:
-            try:
-                title = v['title'].decode('utf-8')
-            except AttributeError:
-                title = v['title']
-            v.update({'action': 'play', 'isFolder': 'False', 'title': client.replaceHTMLCodes(title)})
+@urldispatcher.register('playlists')
+def playlists():
 
-        for item in self.list:
-            bookmark = dict((k, v) for k, v in iteritems(item) if not k == 'next')
-            bookmark['bookmark'] = item['url']
-            bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
-            refresh = {'title': 30008, 'query': {'action': 'refresh'}}
-            cache_clear = {'title': 30005, 'query': {'action': 'cache_clear'}}
-            item.update({'cm': [refresh, cache_clear, bm_cm]})
+    self_list = _playlists()
 
-        directory.add(self.list)
-    
-    def videos(self):
-    
-        self.list = cache.get(self.item_list, 12)
+    for p in self_list:
+        p.update({'action': 'youtube'})
+        bookmark = dict((k, v) for k, v in iteritems(p) if not k == 'next')
+        bookmark['bookmark'] = p['url']
+        bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
+        refresh = {'title': 30008, 'query': {'action': 'refresh'}}
+        cache_clear = {'title': 30005, 'query': {'action': 'cache_clear'}}
+        p.update({'cm': [refresh, cache_clear, bm_cm]})
 
-        for v in self.list:
-            try:
-                title = v['title'].decode('utf-8')
-            except AttributeError:
-                title = v['title']
-            v.update({'action': 'play', 'isFolder': 'False', 'title': client.replaceHTMLCodes(title)})
+    directory.add(self_list)
 
-        for item in self.list:
-            bookmark = dict((k, v) for k, v in iteritems(item) if not k == 'next')
-            bookmark['bookmark'] = item['url']
-            bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
-            refresh = {'title': 30008, 'query': {'action': 'refresh'}}
-            cache_clear = {'title': 30005, 'query': {'action': 'cache_clear'}}
-            item.update({'cm': [refresh, cache_clear, bm_cm]})
-    
-        directory.add(self.list)
-    
-    def bm_list(self):
-    
-        bm = bookmarks.get()
 
-        na = [{'title': 30012, 'action': None, 'icon': 'not-found.jpg'}]
-    
-        if not bm:
-            directory.add(na)
-            return na
+@urldispatcher.register('youtube', ['url'])
+def youtu(url):
 
-        for item in bm:
-            bookmark = dict((k, v) for k, v in iteritems(item) if not k == 'next')
-            bookmark['delbookmark'] = item['url']
-            item.update({'cm': [{'title': 30007, 'query': {'action': 'deleteBookmark', 'url': json.dumps(bookmark)}}]})
-    
-        self.list = sorted(bm, key=lambda k: k['title'].lower())
+    self_list = _playlist(url)
 
-        directory.add(self.list)
+    if self_list is None:
+        return
 
-    @staticmethod
-    def session(link):
-
-        streams = resolver(link)
-
+    for v in self_list:
         try:
-            addon_enabled = control.addon_details('inputstream.adaptive').get('enabled')
-        except KeyError:
-            addon_enabled = False
+            title = v['title'].decode('utf-8')
+        except AttributeError:
+            title = v['title']
+        v.update({'action': 'play', 'isFolder': 'False', 'title': client.replaceHTMLCodes(title)})
 
-        if not addon_enabled:
-            streams = [s for s in streams if 'mpd' not in s['title'].lower()]
+    for item in self_list:
+        bookmark = dict((k, v) for k, v in iteritems(item) if not k == 'next')
+        bookmark['bookmark'] = item['url']
+        bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
+        refresh = {'title': 30008, 'query': {'action': 'refresh'}}
+        cache_clear = {'title': 30005, 'query': {'action': 'cache_clear'}}
+        item.update({'cm': [refresh, cache_clear, bm_cm]})
 
-        stream = streams[0]['url']
+    directory.add(self_list)
 
-        return stream
 
-    def play(self, url):
+@urldispatcher.register('videos')
+def videos():
 
-        stream = self.session(url)
+    self_list = item_list()
 
-        directory.resolve(stream, dash='.mpd' in stream)
+    if self_list is None:
+        return
+
+    for v in self_list:
+        try:
+            title = v['title'].decode('utf-8')
+        except AttributeError:
+            title = v['title']
+        v.update({'action': 'play', 'isFolder': 'False', 'title': client.replaceHTMLCodes(title)})
+
+    for item in self_list:
+        bookmark = dict((k, v) for k, v in iteritems(item) if not k == 'next')
+        bookmark['bookmark'] = item['url']
+        bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
+        refresh = {'title': 30008, 'query': {'action': 'refresh'}}
+        cache_clear = {'title': 30005, 'query': {'action': 'cache_clear'}}
+        item.update({'cm': [refresh, cache_clear, bm_cm]})
+
+    directory.add(self_list)
+
+
+@urldispatcher.register('bookmarks')
+def bm_list():
+
+    bm = bookmarks.get()
+
+    na = [{'title': 30012, 'action': None, 'icon': 'not-found.jpg'}]
+
+    if not bm:
+        directory.add(na)
+        return na
+
+    for item in bm:
+        bookmark = dict((k, v) for k, v in iteritems(item) if not k == 'next')
+        bookmark['delbookmark'] = item['url']
+        item.update({'cm': [{'title': 30007, 'query': {'action': 'deleteBookmark', 'url': json.dumps(bookmark)}}]})
+
+    self_list = sorted(bm, key=lambda k: k['title'].lower())
+
+    directory.add(self_list)
+
+
+def session(link):
+
+    streams = resolver(link)
+
+    try:
+        addon_enabled = control.addon_details('inputstream.adaptive').get('enabled')
+    except KeyError:
+        addon_enabled = False
+
+    if not addon_enabled:
+        streams = [s for s in streams if 'mpd' not in s['title'].lower()]
+
+    stream = streams[0]['url']
+
+    return stream
+
+
+@urldispatcher.register('play', ['url'])
+def play(url):
+
+    stream = session(url)
+
+    directory.resolve(stream, dash='.mpd' in stream)
