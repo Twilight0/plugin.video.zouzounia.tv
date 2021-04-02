@@ -23,27 +23,30 @@ import json
 from base64 import b64decode
 from tulip import youtube, directory, control, cache, bookmarks, client
 from tulip.url_dispatcher import urldispatcher
-from tulip.compat import iteritems, py3_dec
+from tulip.compat import iteritems
 from youtube_resolver import resolve as resolver
 
-function_cache = cache.FunctionCache()
+key = b64decode('0g0RRFlc2ITLUpVS2hjVhpmYF50cyknWENUMN9WQrFmQ5NVY6lUQ'[::-1])  # please do not copy this key
+function_cache = cache.FunctionCache().cache_function
 
-if control.setting('language') == '0':
-    if control.infoLabel('System.Language') == 'Greek':
+
+def channel_id():
+
+    if control.setting('language') == '0':
+        if control.infoLabel('System.Language') == 'Greek':
+            main_id = 'UC9QSJuIBLUT2GbjgKymkTaQ'
+        elif control.infoLabel('System.Language') == 'Japanese':
+            main_id = 'UCGVTSfgmHJBzpq1gVq1ofhA'
+        else:
+            main_id = 'UCzsQf6eiWz4gIHgx0oYadXA'
+    elif control.setting('language') == '2':
         main_id = 'UC9QSJuIBLUT2GbjgKymkTaQ'
-    elif control.infoLabel('System.Language') == 'Japanese':
+    elif control.setting('language') == '3':
         main_id = 'UCGVTSfgmHJBzpq1gVq1ofhA'
     else:
         main_id = 'UCzsQf6eiWz4gIHgx0oYadXA'
-elif control.setting('language') == '2':
-    main_id = 'UC9QSJuIBLUT2GbjgKymkTaQ'
-elif control.setting('language') == '3':
-    main_id = 'UCGVTSfgmHJBzpq1gVq1ofhA'
-else:
-    main_id = 'UCzsQf6eiWz4gIHgx0oYadXA'
 
-
-key = py3_dec(b64decode('0g0RRFlc2ITLUpVS2hjVhpmYF50cyknWENUMN9WQrFmQ5NVY6lUQ'[::-1]))  # please do not copy this key
+    return main_id
 
 
 @urldispatcher.register('main')
@@ -85,30 +88,30 @@ def main():
     directory.add(self_list)
 
 
-@function_cache.cache_method(12)
-def item_list():
-
-    return youtube.youtube(key=key).videos(main_id, limit=10)
-
-
-@function_cache.cache_method(48)
-def _playlists():
-
-    return youtube.youtube(key=key).playlists(main_id, limit=10)
+@function_cache(2880)
+def yt_playlists():
+    return youtube.youtube(key=key).playlists(channel_id())
 
 
-@function_cache.cache_method(12)
-def _playlist(plink):
-    return youtube.youtube(key=key).playlist, 12, plink
+@function_cache(720)
+def yt_playlist(url):
+    
+    return youtube.youtube(key=key).playlist(url, limit=10)
+
+
+@function_cache(360)
+def yt_videos():
+    
+    return youtube.youtube(key=key).videos(channel_id(), limit=2)
 
 
 @urldispatcher.register('playlists')
 def playlists():
 
-    self_list = _playlists()
+    self_list = yt_playlists()
 
     for p in self_list:
-        p.update({'action': 'youtube'})
+        p.update({'action': 'youtu'})
         bookmark = dict((k, v) for k, v in iteritems(p) if not k == 'next')
         bookmark['bookmark'] = p['url']
         bm_cm = {'title': 30006, 'query': {'action': 'addBookmark', 'url': json.dumps(bookmark)}}
@@ -119,10 +122,10 @@ def playlists():
     directory.add(self_list)
 
 
-@urldispatcher.register('youtube', ['url'])
+@urldispatcher.register('youtu', ['url'])
 def youtu(url):
 
-    self_list = _playlist(url)
+    self_list = yt_playlist(url)
 
     if self_list is None:
         return
@@ -148,7 +151,7 @@ def youtu(url):
 @urldispatcher.register('videos')
 def videos():
 
-    self_list = item_list()
+    self_list = yt_videos()
 
     if self_list is None:
         return

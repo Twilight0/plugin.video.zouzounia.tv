@@ -19,7 +19,7 @@
 """
 
 from tulip.url_dispatcher import urldispatcher
-from tulip.cache import FunctionCache, clear
+from tulip.cache import FunctionCache
 from tulip.control import openSettings
 
 
@@ -27,7 +27,6 @@ from tulip.control import openSettings
 def cache_clear():
 
     FunctionCache().reset_cache(notify=True, label_success=30010)
-    clear(notify=False)
 
 
 @urldispatcher.register('settings')

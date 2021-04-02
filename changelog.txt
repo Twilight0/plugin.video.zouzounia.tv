@@ -1,6 +1,11 @@
-[B]4.0.0[/B]
+[B]4.1.0[/B]
+- Change cache method
+- Various other tweaks
+
+[B]4.0.X[/B]
 - Reworked addon code to use url dispatcher
 - Utilize Function cache instead of legacy cache.get for listings
+- Enable reuse language invoker
 
 [B]3.1.0[/B]
 - Updated youtube api key
